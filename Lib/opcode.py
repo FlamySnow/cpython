@@ -15,11 +15,7 @@ __all__ = ["cmp_op", "hasconst", "hasname", "hasjrel", "hasjabs",
 # Both our chickens and eggs are allayed.
 #     --Larry Hastings, 2013/11/23
 
-try:
-    from _opcode import stack_effect
-    __all__.append('stack_effect')
-except ImportError:
-    pass
+import random
 
 cmp_op = ('<', '<=', '==', '!=', '>', '>=')
 
@@ -34,6 +30,16 @@ hasnargs = [] # unused
 
 opmap = {}
 opname = ['<%r>' % (op,) for op in range(256)]
+
+busy_opcodes = []
+
+
+def gen_opcode(a, b):
+    opcode = random.randint(a, b)
+    while opcode in busy_opcodes:
+        opcode = random.randint(a, b)
+    busy_opcodes.append(opcode)
+    return opcode
 
 def def_op(name, op):
     opname[op] = name
@@ -54,146 +60,158 @@ def jabs_op(name, op):
 # Instruction opcodes for compiled code
 # Blank lines correspond to available opcodes
 
-def_op('POP_TOP', 1)
+def_op('POP_TOP', gen_opcode(0, 89))
 
-def_op('NOP', 9)
-def_op('UNARY_POSITIVE', 10)
-def_op('UNARY_NEGATIVE', 11)
-def_op('UNARY_NOT', 12)
+def_op('NOP', gen_opcode(0, 89))
+def_op('UNARY_POSITIVE', gen_opcode(0, 89))
+def_op('UNARY_NEGATIVE', gen_opcode(0, 89))
+def_op('UNARY_NOT', gen_opcode(0, 89))
 
-def_op('UNARY_INVERT', 15)
+def_op('UNARY_INVERT', gen_opcode(0, 89))
 
-def_op('BINARY_SUBSCR', 25)
+def_op('BINARY_SUBSCR', gen_opcode(0, 89))
 
-def_op('GET_LEN', 30)
-def_op('MATCH_MAPPING', 31)
-def_op('MATCH_SEQUENCE', 32)
-def_op('MATCH_KEYS', 33)
+def_op('GET_LEN', gen_opcode(0, 89))
+def_op('MATCH_MAPPING', gen_opcode(0, 89))
+def_op('MATCH_SEQUENCE', gen_opcode(0, 89))
+def_op('MATCH_KEYS', gen_opcode(0, 89))
 
-def_op('PUSH_EXC_INFO', 35)
+def_op('PUSH_EXC_INFO', gen_opcode(0, 89))
 
-def_op('WITH_EXCEPT_START', 49)
-def_op('GET_AITER', 50)
-def_op('GET_ANEXT', 51)
-def_op('BEFORE_ASYNC_WITH', 52)
-def_op('BEFORE_WITH', 53)
-def_op('END_ASYNC_FOR', 54)
+def_op('WITH_EXCEPT_START', gen_opcode(0, 89))
+def_op('GET_AITER', gen_opcode(0, 89))
+def_op('GET_ANEXT', gen_opcode(0, 89))
+def_op('BEFORE_ASYNC_WITH', gen_opcode(0, 89))
+def_op('BEFORE_WITH', gen_opcode(0, 89))
+def_op('END_ASYNC_FOR', gen_opcode(0, 89))
 
-def_op('STORE_SUBSCR', 60)
-def_op('DELETE_SUBSCR', 61)
+def_op('STORE_SUBSCR', gen_opcode(0, 89))
+def_op('DELETE_SUBSCR', gen_opcode(0, 89))
 
-def_op('GET_ITER', 68)
-def_op('GET_YIELD_FROM_ITER', 69)
-def_op('PRINT_EXPR', 70)
-def_op('LOAD_BUILD_CLASS', 71)
+def_op('GET_ITER', gen_opcode(0, 89))
+def_op('GET_YIELD_FROM_ITER', gen_opcode(0, 89))
+def_op('PRINT_EXPR', gen_opcode(0, 89))
+def_op('LOAD_BUILD_CLASS', gen_opcode(0, 89))
 
-def_op('GET_AWAITABLE', 73)
-def_op('LOAD_ASSERTION_ERROR', 74)
-def_op('RETURN_GENERATOR', 75)
+def_op('GET_AWAITABLE', gen_opcode(0, 89))
+def_op('LOAD_ASSERTION_ERROR', gen_opcode(0, 89))
+def_op('RETURN_GENERATOR', gen_opcode(0, 89))
 
-def_op('LIST_TO_TUPLE', 82)
-def_op('RETURN_VALUE', 83)
-def_op('IMPORT_STAR', 84)
-def_op('SETUP_ANNOTATIONS', 85)
-def_op('YIELD_VALUE', 86)
-def_op('ASYNC_GEN_WRAP', 87)
-def_op('PREP_RERAISE_STAR', 88)
-def_op('POP_EXCEPT', 89)
+def_op('LIST_TO_TUPLE', gen_opcode(0, 89))
+def_op('RETURN_VALUE', gen_opcode(0, 89))
+def_op('IMPORT_STAR', gen_opcode(0, 89))
+def_op('SETUP_ANNOTATIONS', gen_opcode(0, 89))
+def_op('YIELD_VALUE', gen_opcode(0, 89))
+def_op('ASYNC_GEN_WRAP', gen_opcode(0, 89))
+def_op('PREP_RERAISE_STAR', gen_opcode(0, 89))
+def_op('POP_EXCEPT', gen_opcode(0, 89))
 
 HAVE_ARGUMENT = 90              # Opcodes from here have an argument:
 
-name_op('STORE_NAME', 90)       # Index in name list
-name_op('DELETE_NAME', 91)      # ""
-def_op('UNPACK_SEQUENCE', 92)   # Number of tuple items
-jrel_op('FOR_ITER', 93)
-def_op('UNPACK_EX', 94)
-name_op('STORE_ATTR', 95)       # Index in name list
-name_op('DELETE_ATTR', 96)      # ""
-name_op('STORE_GLOBAL', 97)     # ""
-name_op('DELETE_GLOBAL', 98)    # ""
-def_op('SWAP', 99)
-def_op('LOAD_CONST', 100)       # Index in const list
-hasconst.append(100)
-name_op('LOAD_NAME', 101)       # Index in name list
-def_op('BUILD_TUPLE', 102)      # Number of tuple items
-def_op('BUILD_LIST', 103)       # Number of list items
-def_op('BUILD_SET', 104)        # Number of set items
-def_op('BUILD_MAP', 105)        # Number of dict entries
-name_op('LOAD_ATTR', 106)       # Index in name list
-def_op('COMPARE_OP', 107)       # Comparison operator
-hascompare.append(107)
-name_op('IMPORT_NAME', 108)     # Index in name list
-name_op('IMPORT_FROM', 109)     # Index in name list
-jrel_op('JUMP_FORWARD', 110)    # Number of bytes to skip
-jabs_op('JUMP_IF_FALSE_OR_POP', 111) # Target byte offset from beginning of code
-jabs_op('JUMP_IF_TRUE_OR_POP', 112)  # ""
-jabs_op('JUMP_ABSOLUTE', 113)        # ""
-jabs_op('POP_JUMP_IF_FALSE', 114)    # ""
-jabs_op('POP_JUMP_IF_TRUE', 115)     # ""
-name_op('LOAD_GLOBAL', 116)     # Index in name list
-def_op('IS_OP', 117)
-def_op('CONTAINS_OP', 118)
-def_op('RERAISE', 119)
-def_op('COPY', 120)
-jabs_op('JUMP_IF_NOT_EXC_MATCH', 121)
-def_op('BINARY_OP', 122)
-jrel_op('SEND', 123) # Number of bytes to skip
-def_op('LOAD_FAST', 124)        # Local variable number
-haslocal.append(124)
-def_op('STORE_FAST', 125)       # Local variable number
-haslocal.append(125)
-def_op('DELETE_FAST', 126)      # Local variable number
-haslocal.append(126)
-jabs_op('JUMP_IF_NOT_EG_MATCH', 127)
-jabs_op('POP_JUMP_IF_NOT_NONE', 128)
-jabs_op('POP_JUMP_IF_NONE', 129)
-def_op('RAISE_VARARGS', 130)    # Number of raise arguments (1, 2, or 3)
+name_op('STORE_NAME', gen_opcode(90, 143))       # Index in name list
+name_op('DELETE_NAME', gen_opcode(90, 143))      # ""
+def_op('UNPACK_SEQUENCE', gen_opcode(90, 143))   # Number of tuple items
+jrel_op('FOR_ITER', gen_opcode(90, 143))
+def_op('UNPACK_EX', gen_opcode(90, 143))
+name_op('STORE_ATTR', gen_opcode(90, 143))       # Index in name list
+name_op('DELETE_ATTR', gen_opcode(90, 143))      # ""
+name_op('STORE_GLOBAL', gen_opcode(90, 143))     # ""
+name_op('DELETE_GLOBAL', gen_opcode(90, 143))    # ""
+def_op('SWAP', gen_opcode(90, 143))
+_load_const = gen_opcode(90, 143)
+def_op('LOAD_CONST', _load_const)       # Index in const list
+hasconst.append(_load_const)
+name_op('LOAD_NAME', gen_opcode(90, 143))       # Index in name list
+def_op('BUILD_TUPLE', gen_opcode(90, 143))      # Number of tuple items
+def_op('BUILD_LIST', gen_opcode(90, 143))       # Number of list items
+def_op('BUILD_SET', gen_opcode(90, 143))        # Number of set items
+def_op('BUILD_MAP', gen_opcode(90, 143))        # Number of dict entries
+name_op('LOAD_ATTR', gen_opcode(90, 143))       # Index in name list
+_comp_op = gen_opcode(90, 143)
+def_op('COMPARE_OP', _comp_op)       # Comparison operator
+hascompare.append(_comp_op)
+name_op('IMPORT_NAME', gen_opcode(90, 143))     # Index in name list
+name_op('IMPORT_FROM', gen_opcode(90, 143))     # Index in name list
+jrel_op('JUMP_FORWARD', gen_opcode(90, 143))    # Number of bytes to skip
+jabs_op('JUMP_IF_FALSE_OR_POP', gen_opcode(90, 143)) # Target byte offset from beginning of code
+jabs_op('JUMP_IF_TRUE_OR_POP', gen_opcode(90, 143))  # ""
+jabs_op('JUMP_ABSOLUTE', gen_opcode(90, 143))        # ""
+jabs_op('POP_JUMP_IF_FALSE', gen_opcode(90, 143))    # ""
+jabs_op('POP_JUMP_IF_TRUE', gen_opcode(90, 143))     # ""
+name_op('LOAD_GLOBAL', gen_opcode(90, 143))     # Index in name list
+def_op('IS_OP', gen_opcode(90, 143))
+def_op('CONTAINS_OP', gen_opcode(90, 143))
+def_op('RERAISE', gen_opcode(90, 143))
+def_op('COPY', gen_opcode(90, 143))
+jabs_op('JUMP_IF_NOT_EXC_MATCH', gen_opcode(90, 143))
+def_op('BINARY_OP', gen_opcode(90, 143))
+jrel_op('SEND', gen_opcode(90, 143)) # Number of bytes to skip
+_lf = gen_opcode(90, 143)
+def_op('LOAD_FAST', _lf)        # Local variable number
+haslocal.append(_lf)
+_st_f = gen_opcode(90, 143)
+def_op('STORE_FAST', _st_f)       # Local variable number
+haslocal.append(_st_f)
+del_fast = gen_opcode(90, 143)
+def_op('DELETE_FAST', del_fast)      # Local variable number
+haslocal.append(del_fast)
+jabs_op('JUMP_IF_NOT_EG_MATCH', gen_opcode(90, 143))
+jabs_op('POP_JUMP_IF_NOT_NONE', gen_opcode(90, 143))
+jabs_op('POP_JUMP_IF_NONE', gen_opcode(90, 143))
+def_op('RAISE_VARARGS', gen_opcode(90, 143))    # Number of raise arguments (1, 2, or 3)
 
-def_op('MAKE_FUNCTION', 132)    # Flags
-def_op('BUILD_SLICE', 133)      # Number of items
-jabs_op('JUMP_NO_INTERRUPT', 134) # Target byte offset from beginning of code
-def_op('MAKE_CELL', 135)
-hasfree.append(135)
-def_op('LOAD_CLOSURE', 136)
-hasfree.append(136)
-def_op('LOAD_DEREF', 137)
-hasfree.append(137)
-def_op('STORE_DEREF', 138)
-hasfree.append(138)
-def_op('DELETE_DEREF', 139)
-hasfree.append(139)
+def_op('MAKE_FUNCTION', gen_opcode(90, 143))    # Flags
+def_op('BUILD_SLICE', gen_opcode(90, 143))      # Number of items
+jabs_op('JUMP_NO_INTERRUPT', gen_opcode(90, 143)) # Target byte offset from beginning of code
+make_cell = gen_opcode(90, 143)
+def_op('MAKE_CELL', make_cell)
+hasfree.append(make_cell)
+load_closure = gen_opcode(90, 143)
+def_op('LOAD_CLOSURE', load_closure)
+hasfree.append(load_closure)
+load_deref = gen_opcode(90, 143)
+def_op('LOAD_DEREF', load_deref)
+hasfree.append(load_deref)
+tmp = gen_opcode(90, 143)
+def_op('STORE_DEREF', tmp)
+hasfree.append(tmp)
+tmp = gen_opcode(90, 143)
+def_op('DELETE_DEREF', tmp)
+hasfree.append(tmp)
 
-def_op('CALL_FUNCTION_EX', 142)  # Flags
+def_op('CALL_FUNCTION_EX', gen_opcode(90, 143))  # Flags
 
 def_op('EXTENDED_ARG', 144)
 EXTENDED_ARG = 144
-def_op('LIST_APPEND', 145)
-def_op('SET_ADD', 146)
-def_op('MAP_ADD', 147)
-def_op('LOAD_CLASSDEREF', 148)
-hasfree.append(148)
-def_op('COPY_FREE_VARS', 149)
+def_op('LIST_APPEND', gen_opcode(145, 180))
+def_op('SET_ADD', gen_opcode(145, 180))
+def_op('MAP_ADD', gen_opcode(145, 180))
+tmp = gen_opcode(145, 180)
+def_op('LOAD_CLASSDEREF', tmp)
+hasfree.append(tmp)
+def_op('COPY_FREE_VARS', gen_opcode(145, 180))
 
-def_op('RESUME', 151)
-def_op('MATCH_CLASS', 152)
+def_op('RESUME', gen_opcode(145, 180))
+def_op('MATCH_CLASS', gen_opcode(145, 180))
 
-def_op('FORMAT_VALUE', 155)
-def_op('BUILD_CONST_KEY_MAP', 156)
-def_op('BUILD_STRING', 157)
+def_op('FORMAT_VALUE', gen_opcode(145, 180))
+def_op('BUILD_CONST_KEY_MAP', gen_opcode(145, 180))
+def_op('BUILD_STRING', gen_opcode(145, 180))
 
-name_op('LOAD_METHOD', 160)
+name_op('LOAD_METHOD', gen_opcode(145, 180))
 
-def_op('LIST_EXTEND', 162)
-def_op('SET_UPDATE', 163)
-def_op('DICT_MERGE', 164)
-def_op('DICT_UPDATE', 165)
+def_op('LIST_EXTEND', gen_opcode(145, 180))
+def_op('SET_UPDATE', gen_opcode(145, 180))
+def_op('DICT_MERGE', gen_opcode(145, 180))
+def_op('DICT_UPDATE', gen_opcode(145, 180))
 
-def_op('PRECALL_FUNCTION', 167)
-def_op('PRECALL_METHOD', 168)
+def_op('PRECALL_FUNCTION', gen_opcode(145, 180))
+def_op('PRECALL_METHOD', gen_opcode(145, 180))
 
-def_op('CALL', 171)
-def_op('KW_NAMES', 172)
-hasconst.append(172)
+def_op('CALL', gen_opcode(145, 180))
+tmp = gen_opcode(145, 180)
+def_op('KW_NAMES', tmp)
+hasconst.append(tmp)
 
 del def_op, name_op, jrel_op, jabs_op
 
